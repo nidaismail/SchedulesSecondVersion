@@ -24,7 +24,7 @@ class DepartmentSeeder extends Seeder
             ['name' => "Pharmacology"],
             ['name' => "Community Medicine"],
             ['name' => "Forensic Medicine"],
-            ['name' => " Medical Education"],
+            ['name' => "Medical Education"],
             ['name' => "Allied Health Sciences"],
             ['name' => "Administration"],
             ['name' => "IT"],
@@ -58,7 +58,7 @@ class DepartmentSeeder extends Seeder
             ['name' => "PSD"],
             ['name' => "FNSD"],
             ['name' => "Engineering"],
-            ['name' => " Supply Chain"],
+            ['name' => "Supply Chain"],
             ['name' => "Marketing & Communication"],
             ['name' => "House Job"],
             ['name' => "Marketing & Business Development"],
@@ -72,6 +72,8 @@ class DepartmentSeeder extends Seeder
             ['name' => "Dialysis Unit"],
             ['name' => "Gynae OT"],
             ['name' => "Management"],
+            ['name' => "ANTH"],
+            ['name' => "IMDC"],
             ]);
     }
 }

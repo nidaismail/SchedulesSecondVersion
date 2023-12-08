@@ -86,6 +86,7 @@
                                                                 <th width="250px">Location</th>
                                                                 <th width="150px">Remarks</th>
                                                                 <th width="150px">Non-Admissible</th>
+                                                                <th width="150px">Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -100,6 +101,10 @@
                                                                     <td>{{$data->class->class_name}} </td>
                                                                     <td>{{$data->location->location}} </td>
                                                                     <td>{{$data->remarks}}</td>
+                                                                    <td>
+                                                                    <a href="{{ url('delete', $data->id) }}" class="delete-button" style="color: #1BA998;">
+                                                                        <i class="fas fa-trash-alt"></i></td>
+                                                                    </a>
                                                                     <td>
                                                                         <?php
                                                                         $checked =  $data->admissible==1 ? 'checked="checked"' : 'nooo'?>

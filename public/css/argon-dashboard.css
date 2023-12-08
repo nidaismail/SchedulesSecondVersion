@@ -18421,7 +18421,12 @@ textarea[resize="horizontal"] {
 .separator-skew {
   height: 60px;
 }
-
+.custom-table .custom-header th {
+  font-weight: 900;
+  text-align: center;
+  padding-left: 700px;
+  font-size: 15px; /* Adjust the font size as needed */
+}
 @media (min-width: 1200px) {
   .separator-skew {
     height: 70px;

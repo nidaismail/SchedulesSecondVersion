@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use DB;
 use Auth;
 // namespace App\Http\Controllers\Auth;
 
@@ -61,20 +61,21 @@ class UserdashboardController extends Controller
 
         // $data->admissible = $request['schedule_id'];
     }
-    //admin
-    // public function preview()
-    // {
-    //     $persondata = Schedule::where('id', '>=', 1)->with(['person','activity','location'])->get();
-
-    //     // $activitydata = Schedule::where('id', '>=', 1)->with(['activity'])->get();
-
-    //     return view('userDashboard')->with(compact('persondata'));
-    // }
-
-    // $checked_array = $request->schedule_id;
-    //foreach($persondata->id as $key){
-        //if(in-array($request->persondata[$key], $checked_array))
+   
+  
+    public function index(){
+        $users = DB::select('select * from schedule');
+        return view('user_delete_view',['users'=>$users]);
+        }
+        public function destroy($id) {
+        DB::delete('delete from schedule where id = ?',[$id]);
         
-
-      
+        return back()
+        ->with('success','Record Deleted Successfully')
+        ->with('file');
+        return redirect()->route('/view');
+        }
 }
+
+
+

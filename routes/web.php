@@ -56,8 +56,8 @@ Route::get('/', function () {
     Route::get('edit-records', [App\Http\Controllers\AdmindashboardController::class, 'index']);
     Route::get('edit/{id}', [App\Http\Controllers\AdmindashboardController::class, 'show']);
     Route::post('edit/{id}', [App\Http\Controllers\AdmindashboardController::class, 'edit']);
-     Route::get('delete-records', [App\Http\Controllers\UserDeleteController::class, 'index']);
-     Route::get('delete/{id}', [App\Http\Controllers\UserDeleteController::class, 'destroy']);
+    Route::get('delete-records', [App\Http\Controllers\UserdashboardController::class, 'index']);
+    Route::get('delete/{id}', [App\Http\Controllers\UserdashboardController::class, 'destroy']);
         
 });
 Route::group(['middleware' => ['auth']], function() {

@@ -158,7 +158,7 @@
                     <br>
                       <div>
                     <button style="padding: 10px 20px; background-color: #1BA998; color: white; line-height: 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; text-decoration: none;">
-                        Update User
+                        Update
                     </button>
                     <br>
                     <br>

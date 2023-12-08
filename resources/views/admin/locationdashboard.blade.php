@@ -217,8 +217,11 @@
                 <a class="btn btn-custom mr-2" href="{{url('/classadmin')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Class Activity
                 </a>
-                <a class="btn btn-custom mr-2" href="{{url('/locationadmin')}}" target="_self">
+                {{-- <a class="btn btn-custom mr-2" href="{{url('/locationadmin')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Location Activity
+                </a> --}}
+                <a class="btn btn-custom mr-2" href="{{url('/getSchedules')}}" target="_self">
+                    <i class="ni ni-key-25 text-info"></i>Weekly Schedule
                 </a>
                 
             </div>
