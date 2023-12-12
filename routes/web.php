@@ -58,6 +58,7 @@ Route::get('/', function () {
     Route::post('edit/{id}', [App\Http\Controllers\AdmindashboardController::class, 'edit']);
     Route::get('delete-records', [App\Http\Controllers\UserdashboardController::class, 'index']);
     Route::get('delete/{id}', [App\Http\Controllers\UserdashboardController::class, 'destroy']);
+    Route::get('/otherFunctionality', [App\Http\Controllers\UserController::class, 'otherFunctionality'])->name('otherFunctionality');
         
 });
 Route::group(['middleware' => ['auth']], function() {

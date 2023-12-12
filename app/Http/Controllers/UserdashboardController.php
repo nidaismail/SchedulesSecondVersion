@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use DB;
 use Auth;
+use App\Models\Grade;
 // namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
@@ -14,31 +15,34 @@ class UserdashboardController extends Controller
     {
         $today = Today()->toDateString();
         $user_role = Auth::user()->getRoleNames();
-       
+        $classes = Grade::all();
         foreach ($user_role as $role) {
             if ($role == 'admin') {
               
                 $persondata = Schedule::where('date', '>=', $today)
                                             ->with(['user','activity','location'])
                                             ->orderBy('date')
-                                            ->get();                     
-                    return view('userdashboard')->with(compact('persondata'));
+                                            ->get();       
+                                            $classes = Grade::all();                 
+                    return view('userdashboard')->with(compact('persondata','classes'));
                 
             } elseif ($role == 'supervisor') {
                     $persondata = Schedule::where('department', '=', Auth::user()->dep_id)
                                             ->where('date', '>=', $today)
                                             ->with(['user','activity','location'])
                                             ->orderBy('date')
-                                            ->get();                       
-                    return view('userdashboard')->with(compact('persondata'));
+                                            ->get();     
+                                            $classes = Grade::all();                     
+                    return view('userdashboard')->with(compact('persondata','classes'));
             } else {
                 
                 $persondata = Schedule::where('user_id', '=', Auth::user()->userID)
                                         ->where('date', '>=', $today)
                                         ->with(['user','activity','location'])
                                         ->orderBy('date')
-                                        ->get();                       
-                return view('userdashboard')->with(compact('persondata'));
+                                        ->get();    
+                                        $classes = Grade::all();                
+                return view('userdashboard')->with(compact('persondata','classes'));
             }
         }
     }
@@ -48,8 +52,9 @@ class UserdashboardController extends Controller
         $schedules = Schedule::where('date', '>=', $today)
                                             ->with(['user','activity','location'])
                                             ->orderBy('date')
-                                            ->get();                     
-                    return view('classview')->with(compact('schedules'));
+                                            ->get();      
+                                            $classes = Grade::all();               
+                    return view('classview')->with(compact('schedules','classes'));
         }
     
        

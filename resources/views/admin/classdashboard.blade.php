@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
-      Dashboard
+      Class Activity Dashboard
     </title>
     
     <!-- Favicon -->
@@ -187,15 +187,18 @@ $(document).ready(function() {
                 <a class="btn btn-custom" href="{{url('/home')}}">
                     <i class="ni ni-single-02 text-yellow"></i> Home
                 </a>
+                <a class="btn btn-custom mr-2" href="{{url('/locationadmin')}}" target="_self">
+                    <i class="ni ni-key-25 text-info"></i> Campus Activity
+                </a>
+                <a class="btn btn-custom mr-2" href=" {{url('/roles')}}" target="_self">
+                    <i class="ni ni-key-25 text-info"></i> Locations Activity
+                </a>
                 <a class="btn btn-custom mr-2" href="{{url('/admin')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Person Activity
                 </a>
                 {{-- <a class="btn btn-custom mr-2" href="{{url('/classadmin')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Class Activity
                 </a> --}}
-                <a class="btn btn-custom mr-2" href="{{url('/locationadmin')}}" target="_self">
-                    <i class="ni ni-key-25 text-info"></i> Location Activity
-                </a>
                 <a class="btn btn-custom mr-2" href="{{url('/getSchedules')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i>Weekly Schedule
                 </a>
@@ -213,7 +216,7 @@ $(document).ready(function() {
             <div class="container-fluid">
                 <!-- Brand -->
                 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
-                    href="{{url('/admin')}}">Dashboard</a>
+                    href="{{url('/admin')}}">Class Activity Dashboard</a>
                 
             </div>
         </nav>

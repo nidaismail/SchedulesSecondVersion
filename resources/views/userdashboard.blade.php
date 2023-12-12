@@ -66,6 +66,68 @@
                                 <i class="fas fa-table me-1"></i>
                                 Employees Data
                             </div>
+                            <form class="" method="GET" action="/getSchedules">
+                                @csrf
+                                <div class="container ">
+                                    <div class=" rounded-3 text-center">
+                                        <div class="content">
+                                            <div class="container text-left">
+                                                <div class="row justify-content-center given-mar">
+                                                    <div class="col-lg-10">
+                                                        <div class="row">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label for="input_from" style="color: grey; font-size: 16px;  font-weight: bold; text-transform: uppercase;">Date From</label>
+                                                                        <input type="date" data-date="" data-date-format="DD MMMM YYYY" min="0"
+                                                                            name="start_date" class="form-control" id="start_date" placeholder="" style=""
+                                                                            required value="<?php echo date('Y-m-d'); ?>">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-1"></div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label for="input_to" style="color: grey;  font-size: 16px; padding-left:14px; font-weight: bold; text-transform: uppercase;">Date To</label>
+                                                                        <input type="date" data-date="" data-date-format="DD MMMM YYYY"
+                                                                            name="end_date" class="form-control" id="end_date"
+                                                                            placeholder="End Date" required
+                                                                            value="<?php echo date('Y-m-t', strtotime('0 months')); ?>">
+                                                                    </div>
+                                                                </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-4"> 
+                                                                <div class="form-group">
+                                                                    <div class="dropdown" >
+                                                                        <button class="btn btn-success form-control dropdown-toggle btn-block" type="button" id="classDropdown2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  style="margin-top: 1.8rem;">
+                                                                            Select Class
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="classDropdown2">
+                                                                            <input type="text" id="classSearch2" class="form-control" placeholder="Search Classes...">
+                                                                            @foreach($clas as $cl)
+                                                                                <div class="form-check class-item2">
+                                                                                    <input type="radio" name="class" id="class_{{ $cl->id }}" value="{{ $cl->id }}" class="form-check-input">
+                                                                                    <label class="form-check-label" for="class_{{ $cl->id }}">{{ $cl->class_name }}</label>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <button type="submit" class="btn btn-success rounded-3  btn-block" style="margin-top: 1.8rem ; margin-left: 2.8rem;">Get Schedules</button>
+                                                                </div>
+                                                        </div>
+                                                      
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
                             <div class="row ">
                                 <div class="col-md-12">
                                     <div class="panel panel-primary filterable">
@@ -90,7 +152,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($persondata as $data)
+                                                            @foreach ($schedules as $data)
                                                                 <tr>
                                                                     <td>{{ \Carbon\Carbon::parse($data->date)->format('d F, Y') }}</td>
                                                                     <td>{{$data->day}}</td>

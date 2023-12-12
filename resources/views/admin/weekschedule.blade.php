@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
-      Dashboard
+      Monthly Schedules Dashboard
     </title>
     <!-- Favicon -->
     <link href="./images/favicon.png" rel="icon" type="image/png"> 
@@ -34,6 +34,9 @@
     </script>
 
   <style>
+    body{
+        overflow: hidden;
+    }
     /* CSS to set the text color based on background color */
     td[data-color="red"] {
         background-color: red;
@@ -55,29 +58,6 @@
     border-collapse: collapse;
     width: 100%;
     table-layout: fixed; /* Important for fixed column width */
-}
-
-.static-column {
-    position: sticky;
-    left: 0;
-    background-color: white;
-    z-index: 1;
-    /* Set width for the static columns */
-    width: 170px; /* Adjust according to your needs */
-    
-}
-.static-column + .static-column {
-    margin-left: -1px; /* Adjust for any gap caused by default spacing */
-}
-
-.static-column:nth-child(2) {
-    left: 171px;
-    width: 280px;
-}
-.static-column:nth-child(3) {
-    left: 320px;
-    width: 310px;/* Adjust based on the width of the first static column */
-   
 }
 .btn-custom {
     background-color: #16A796;
@@ -168,14 +148,18 @@
                 <a class="btn btn-custom" href="{{url('/home')}}">
                     <i class="ni ni-single-02 text-yellow"></i> Home
                 </a>
-                <a class="btn btn-custom mr-2" href="{{url('/admin')}}" target="_self">
-                    <i class="ni ni-key-25 text-info"></i> Person Activity
-                </a>
+               
                 <a class="btn btn-custom mr-2" href="{{url('/classadmin')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Class Activity
                 </a>
                 <a class="btn btn-custom mr-2" href="{{url('/locationadmin')}}" target="_self">
+                    <i class="ni ni-key-25 text-info"></i> Campus Activity
+                </a>
+                <a class="btn btn-custom mr-2" href=" {{url('/roles')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Location Activity
+                </a>
+                <a class="btn btn-custom mr-2" href="{{url('/admin')}}" target="_self">
+                    <i class="ni ni-key-25 text-info"></i> Person Activity
                 </a>
             </div>
         </div>
@@ -187,7 +171,7 @@
             <div class="container-fluid">
                 <!-- Brand -->
                 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
-                    href="{{url('/admin')}}">Dashboard</a>
+                    href="{{url('/admin')}}">Monthly Schedule Dashboard</a>
             </div>
         </nav>
         <!-- End Navbar -->
@@ -239,7 +223,7 @@
                                                             </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-md-4"> 
+                                                        <div class="col-md-4" style="padding-left: 1px;"> 
                                                             <div class="form-group">
                                                                 <div class="dropdown" >
                                                                     <button class="btn btn-success form-control dropdown-toggle btn-block" type="button" id="classDropdown2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  style="margin-top: 1.8rem;">
@@ -258,7 +242,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
-                                                            <button type="submit" class="btn btn-success rounded-3  btn-block" style="margin-top: 1.8rem ; margin-left: 2.8rem;">Get Schedules</button>
+                                                            <button type="submit" class="btn btn-success rounded-3  btn-block" style="margin-top: 1.8rem ; margin-left: 3.8rem;">Get Schedules</button>
                                                             </div>
                                                     </div>
                                                   
@@ -272,45 +256,50 @@
                     </div>
                 </form>
                 
+                @if($class)
+                    <div class="schedule-header">
+                        @if($class)
+                            <p style="text-align: center; margin:1rem;"><span style="font-weight: bold;">Schedules for <span style="color:#2DCE89;"> {{ $class->class_name }}</span> From  {{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} To   {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</span></p>
+                        @endif
+                       
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
                 <div class="table-wrapper">
-                                 @if($class)
-                                     <table class="custom-table table table-bordered table-responsive">
-                                         <tbody>
-                                             @php
-                                                 $uniqueDates = $schedules->pluck('date')->unique();
-                                             @endphp
-                                             <tr>
-                                                 <th></th> <!-- Empty corner cell -->
-                                                 @foreach($uniqueDates as $date)
-                                                     <th>{{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</th>
-                                                 @endforeach
-                                             </tr>
-                                             @foreach($schedules->groupBy('time_from') as $time => $timeSchedules)
-                                                 <tr>
-                                                     <td><b>{{ \Carbon\Carbon::parse($time)->format('h:i A') }}</b></td>
-                                                     @foreach($uniqueDates as $date)
-                                                         @php
-                                                             $matchingSchedules = $timeSchedules->where('date', $date);
-                                                         @endphp
-                                                         <td>
-                                                             @foreach($matchingSchedules as $schedule)
-                                                                 <strong>{{ $schedule->user->name }}</strong><br>
-                                                                 {{ $schedule->remarks }}<br>
-                                                                 {{ $schedule->location->location }}
-                                                                 <br>
-                                                             @endforeach
-                                                         </td>
-                                                     @endforeach
-                                                 </tr>
-                                             @endforeach
-                                         </tbody>
-                                     </table>
+                <table class="custom-table table table-bordered table-responsive">
+                    <tbody>
+                        @foreach($schedules->groupBy('date') as $date => $dateSchedules)
+                            <tr>
+                                <td><b>{{ \Carbon\Carbon::parse($date)->format('M d, Y') }}</b></td>
+                                @php
+                                    $groupedSchedules = $dateSchedules->groupBy('time_from');
+                                @endphp
+                                @foreach($groupedSchedules as $time => $timeSchedules)
+                                    @php
+                                        $endTime = $timeSchedules->max('time_to');
+                                    @endphp
+                                    <td>
+                                        <b>{{ \Carbon\Carbon::parse($time)->format('H:i') }} - {{ \Carbon\Carbon::parse($endTime)->format('H:i') }}</b><br>
+                                        @foreach($timeSchedules as $schedule)
+                                            <strong>{{ $schedule->user->name }}</strong><br>
+                                            {{ $schedule->remarks }}<br>
+                                            {{ $schedule->location->location }}
+                                            <br>
+                                        @endforeach
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
                     @else
                         <p style="font-family: Arial, sans-serif; align:center; font-size: 16px; color: #333; background-color: #f7f7f7; padding: 10px; border-radius: 5px;">
                             Select a class to view its available information.
                         </p>
                     @endif
-                       </div>       
+                       </div>   
+                        </div>
+                    </div>    
                    </div>
                     </div>
                 </div>

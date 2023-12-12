@@ -5,13 +5,9 @@
 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
 <link href="css/dashboardstyles.css" rel="stylesheet" />
 <link href="images/favicon.png" rel="icon" type="image/png"> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 
 
-    <!-- Favicon -->
-  
-    <!-- Icons -->
-   
-    <!-- CSS Files -->
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" /> --}}
@@ -47,7 +43,57 @@
 .filterable .filters input[disabled]:-ms-input-placeholder {
   color: #333;
 }
+.filter-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
 
+.filter-options label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.filter-options input[type="date"],
+.filter-options select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    width: 150px;
+}
+
+        /* Custom styling for the select dropdown */
+        .form-group {
+            text-align: center;
+        }
+        #classSelection {
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 100%; /* Adjust the width as needed */
+            box-sizing: border-box;
+            /* Additional styles to prevent cutoff */
+            height: 40px; /* Adjust the height as needed */
+            appearance: none; /* Remove default arrow icon in some browsers */
+            -webkit-appearance: none; /* For Safari/Chrome */
+            -moz-appearance: none; /* For Firefox */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 18px 18px;
+        }
+
+        /* Responsive styles for smaller screens */
+        @media screen and (max-width: 768px) {
+            #classSelection {
+                height: auto; /* Set height to auto for smaller screens */
+                max-height: 150px; /* Limit max height for scrollable dropdown */
+                overflow-y: auto; /* Enable vertical scrollbar if needed */
+            }
+        }
     </style>
 
 
@@ -55,62 +101,95 @@
 @endpush
 
 @push('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const classSelectionInput = document.getElementById('classSelection');
+        const tableRows = document.querySelectorAll('#dataTable tbody tr');
+
+        // Initially hide all table rows
+        tableRows.forEach(function(row) {
+            row.style.display = 'none';
+        });
+
+        function applyFilters() {
+            const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+            const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+            const selectedClass = classSelectionInput.value.toLowerCase();
+
+            let allConditionsMet = startDate && endDate && selectedClass !== '';
+
+            tableRows.forEach(function(row) {
+                const rowDate = new Date(row.cells[1].innerText); // Assuming date is in the second column
+                const rowClass = row.cells[0].innerText.toLowerCase(); // Assuming class name is in the first column
+
+                const showByDate = (!startDate || !endDate || (rowDate >= startDate && rowDate <= endDate));
+                const showByClass = (selectedClass === '' || rowClass === selectedClass);
+
+                if (allConditionsMet && showByDate && showByClass) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        startDateInput.addEventListener('change', applyFilters);
+        endDateInput.addEventListener('change', applyFilters);
+        classSelectionInput.addEventListener('change', applyFilters);
+    });
+</script>
 <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 <script>
-    /*
-    Please consider that the JS part isn't production ready at all, I just code it to show the concept of merging filters and titles together !
-    */
-    
-    
-    
     $(document).ready(function() {
     
-      $('input[type=date]').change(function () {
-        this.form.submit();
-      });
-    
-        $('.filterable .btn-filter').click(function() {
-            var $panel = $(this).parents('.filterable'),
-                $filters = $panel.find('.filters input'),
-                $tbody = $panel.find('.table tbody');
-            if ($filters.prop('disabled') == true) {
-                $filters.prop('disabled', false);
-                $filters.first().focus();
-            } else {
-                $filters.val('').prop('disabled', true);
-                $tbody.find('.no-result').remove();
-                $tbody.find('tr').show();
-            }
-        });
-        $('.filterable .filters input').keyup(function(e) {
-            /* Ignore tab key */
-            var code = e.keyCode || e.which;
-            if (code == '9') return;
-            /* Useful DOM data and selectors */
-            var $input = $(this),
-                inputContent = $input.val().toLowerCase(),
-                $panel = $input.parents('.filterable'),
-                column = $panel.find('.filters th').index($input.parents('th')),
-                $table = $panel.find('.table'),
-                $rows = $table.find('tbody tr');
-            /* Dirtiest filter function ever ;) */
-            var $filteredRows = $rows.filter(function() {
-                var value = $(this).find('td').eq(column).text().toLowerCase();
-                return value.indexOf(inputContent) === -1;
-            });
-            /* Clean previous no-result if exist */
-            $table.find('tbody .no-result').remove();
-            /* Show all rows, hide filtered ones (never do that outside of a demo ! xD) */
-            $rows.show();
-            $filteredRows.hide();
-            /* Prepend no-result row if all rows are filtered */
-            if ($filteredRows.length === $rows.length) {
-                $table.find('tbody').prepend($('<tr class="no-result text-center"><td colspan="' + $table
-                    .find('.filters th').length + '">No result found</td></tr>'));
-            }
-        });
+    $('input[type=date]').change(function () {
+      this.form.submit();
     });
-    </script>
+  
+      $('.filterable .btn-filter').click(function() {
+          var $panel = $(this).parents('.filterable'),
+              $filters = $panel.find('.filters input'),
+              $tbody = $panel.find('.table tbody');
+          if ($filters.prop('disabled') == true) {
+              $filters.prop('disabled', false);
+              $filters.first().focus();
+          } else {
+              $filters.val('').prop('disabled', true);
+              $tbody.find('.no-result').remove();
+              $tbody.find('tr').show();
+          }
+      });
+      $('.filterable .filters input').keyup(function(e) {
+          /* Ignore tab key */
+          var code = e.keyCode || e.which;
+          if (code == '9') return;
+          /* Useful DOM data and selectors */
+          var $input = $(this),
+              inputContent = $input.val().toLowerCase(),
+              $panel = $input.parents('.filterable'),
+              column = $panel.find('.filters th').index($input.parents('th')),
+              $table = $panel.find('.table'),
+              $rows = $table.find('tbody tr');
+          /* Dirtiest filter function ever ;) */
+          var $filteredRows = $rows.filter(function() {
+              var value = $(this).find('td').eq(column).text().toLowerCase();
+              return value.indexOf(inputContent) === -1;
+          });
+          /* Clean previous no-result if exist */
+          $table.find('tbody .no-result').remove();
+          /* Show all rows, hide filtered ones (never do that outside of a demo ! xD) */
+          $rows.show();
+          $filteredRows.hide();
+          /* Prepend no-result row if all rows are filtered */
+          if ($filteredRows.length === $rows.length) {
+              $table.find('tbody').prepend($('<tr class="no-result text-center"><td colspan="' + $table
+                  .find('.filters th').length + '">No result found</td></tr>'));
+          }
+      });
+  });
+</script>
 @endpush
 @section('content')
 
@@ -177,8 +256,52 @@
                                             
                                             <h3 class="mb-10 panel-title"></h3>
                                         </div>
-                                        
-                                        <table  class=" table table-bordered table-responsive" >
+                                        <div class="container mt-4">
+                                        <div>
+                                        <div class="panel-body">
+        <div class="panel-heading">
+            <div class="container">
+                <div class="rounded-3 text-center">
+                    <div class="content">
+                        <div class="container text-left">
+                            <div class="row justify-content-center given-mar">
+                                <div class="col-lg-10">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="startDate" style="color: #1BA998; font-size: 16px; font-weight: bold; text-transform: uppercase;">Date From</label>
+                                                <input type="date" style="background-color: #1BA998; color:white; font-weight: bold; "data-date="" data-date-format="DD MMMM YYYY" min="0" name="start_date" class="form-control" id="startDate" placeholder="" style="" required value="<?php echo date('Y-m-d'); ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="endDate" style="color: #1BA998; font-size: 16px; padding-left:14px; font-weight: bold; text-transform: uppercase;">Date To</label>
+                                                <input type="date" style="background-color: #1BA998; color:white; font-weight: bold; " data-date="" data-date-format="DD MMMM YYYY" name="end_date" class="form-control" id="endDate" placeholder="End Date" required value="<?php echo date('Y-m-t', strtotime('0 months')); ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group text-center">
+                                                <label for="classSelection" style="color: #1BA998; font-size: 16px; font-weight: bold; text-transform: uppercase;">Filter by Class:</label>
+                                                <select  id="classSelection" class="form-control">
+                                                    <option  value="">Select a Class</option>
+                                                    <!-- Embedding PHP data into HTML -->
+                                                    @foreach($classes as $class)
+                                                        <option value="{{ $class->class_name }}">{{ $class->class_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Other content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                                        <table  class=" table table-bordered table-responsive" id="dataTable" >
                                             @if(session('success'))
                                             <div class="alert alert-success">
                                                 {{ session('success') }}
@@ -198,7 +321,13 @@
                                                                 <th><input type="text" class="form-control" placeholder="Location" disabled></th>
                                                                 <th><input type="text" class="form-control" placeholder="Remarks" disabled></th>
                                                                 <th><input type="text" class="form-control" placeholder="Non-Admissible" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Delete" disabled></th>
+                                                                <th style="font-size:9px">
+                                                                    <div  style="text-align: center; width: 120%; height: 120%; background-color: white;"class="select-all">
+                                                                      <input style="text-align: center;" type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                                                                      <!-- <span style="text-align: center;" class="select-symbol">&#10003;</span> -->
+                                                                    </div>
+                                                                  </th>
+                                                                
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -249,9 +378,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success rounded-3 justify-content-center mar"
-                                            id="btn-save" >Save
-                                        </button>
+                                      
                                         
                                     </div>
                                 </main>

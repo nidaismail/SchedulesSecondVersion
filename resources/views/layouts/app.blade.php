@@ -28,11 +28,11 @@
             <div class="container">
                 @role('admin')
                 <ul class="navbar-nav">
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link" href="{{url('/roles')}}" target="_blank">
                             <i class="ni ni-key-25 text-info"></i> Users
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a class="nav-link " href="{{url('/admin')}}">
                             <i class="ni ni-single-02 text-yellow"></i> Dashboard

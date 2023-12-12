@@ -1667,9 +1667,9 @@ pre code {
   padding: 0.5rem;
 }
 
-.table-bordered {
+/* .table-bordered {
   border: 1px solid #e9ecef;
-}
+} */
 
 .table-bordered th,
 .table-bordered td {
