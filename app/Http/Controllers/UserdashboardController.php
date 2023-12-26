@@ -68,19 +68,29 @@ class UserdashboardController extends Controller
     }
    
   
-    public function index(){
+    public function index()
+    {
         $users = DB::select('select * from schedule');
-        return view('user_delete_view',['users'=>$users]);
-        }
-        public function destroy($id) {
-        DB::delete('delete from schedule where id = ?',[$id]);
+        return view('user_delete_view', ['users' => $users]);
+    }
+    
+    public function deleteRecords(Request $request, $ids)
+    {
+        $idArray = explode(',', $ids);
         
-        return back()
-        ->with('success','Record Deleted Successfully')
-        ->with('file');
-        return redirect()->route('/view');
+        try {
+            Schedule::whereIn('id', $idArray)->delete();
+            return response()->json(['success' => 'Records deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete records: ' . $e->getMessage()], 500);
         }
-}
+    }
+    }
+
+    
+
+
+
 
 
 

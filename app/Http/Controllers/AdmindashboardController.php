@@ -7,6 +7,8 @@ use App\Models\Person;
 use App\Models\Schedule;
 use App\Models\Location;
 use App\Models\Grade;
+use App\Models\Activity;
+use App\Models\Department;
 use App\Models\User;
 use Carbon\Carbon;
 use DateTime;
@@ -179,14 +181,24 @@ public function show($id)
     $schedule = Schedule::with(['user', 'location'])->find($id);
     $users = User::all();
     $locations = Location::all();
-
-    return view('admin.user_edit_view', compact('schedule', 'users', 'locations'));
+    $departments = Department::all(); 
+    $activities = Activity::all(); 
+    $grades = Grade::all();
+    return view('admin.user_edit_view', compact('schedule', 'users', 'locations','departments','activities','grades'));
 }
 public function edit(Request $request, $id)
 {
-    // Retrieve user and location IDs from the request
+    // Retrieve all form fields from the request
     $location_id = $request->input('location_id');
+    $class_id = $request->input('class_id');
     $user_id = $request->input('user_id');
+    $time_from = $request->input('time_from');
+    $time_to = $request->input('time_to');
+    $remarks = $request->input('remarks');
+    $department_id = $request->input('department');
+    $activity_id = $request->input('activity_id');
+    $day = $request->input('day'); // If present in the form
+    $date = $request->input('date'); // If present in the form
 
     // Check if location_id and user_id are set
     if ($location_id === null || $user_id === null) {
@@ -208,28 +220,20 @@ public function edit(Request $request, $id)
         return back()->with('error', 'User not found');
     }
 
-    // Check if the location is already booked for the specified time frame
-    $startTime = $schedule->time_from;
-    $endTime = $schedule->time_to;
-    $selectedDays = [$schedule->day]; // Assuming day is a single value, change as needed
-
-    $existingSchedules = Schedule::where('location_id', $location_id)
-        ->whereIn('day', $selectedDays)
-        ->where('id', '<>', $id) // Exclude the current schedule from the check
-        ->get();
-
-    foreach ($existingSchedules as $existingSchedule) {
-        if (
-            ($startTime >= $existingSchedule->time_from && $startTime < $existingSchedule->time_to) ||
-            ($endTime > $existingSchedule->time_from && $endTime <= $existingSchedule->time_to) ||
-            ($startTime <= $existingSchedule->time_from && $endTime >= $existingSchedule->time_to)
-        ) {
-            return redirect()->back()->withErrors(['error' => 'Location is already booked for ' . $existingSchedule->user->name . ' at this date and time.']);
-        }
-    }
-
-    // Update the schedule's location_id and user_id
-    $schedule->update(['location_id' => $location_id, 'user_id' => $user->userID]);
+    // Update the schedule's fields
+    $schedule->update([
+        'location_id' => $location_id,
+        'class_id' => $class_id,
+        'user_id' => $user->userID,
+        'time_from' => $time_from,
+        'time_to' => $time_to,
+        'remarks' => $remarks,
+       'department' => $department_id,
+        'activity_id' => $activity_id,
+        'day' => $day, // If present in the form
+        'date' => $date, // If present in the form
+        // Add other fields as needed
+    ]);
 
     // Reload the updated schedule with the associated user
     $updatedSchedule = Schedule::with('user')->find($id);
@@ -241,18 +245,5 @@ public function edit(Request $request, $id)
         return back()->with('error', 'Error updating record');
     }
 }
-    
-    
 
-
-    // public function nextdata(){
-    //     $today = Today()->addDay()->toDateString();
-    //     $admindata = Schedule::where('date', '=', $today)
-    //                         ->with(['person','activity','location'])
-    //                         ->orderBy('date')
-    //                         ->get();
-
-    //     return view('admindashboard')->with(compact('admindata'));
-
-    // }
 }

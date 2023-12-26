@@ -217,6 +217,12 @@ $(document).ready(function () {
                                 {{ session()->get('error') }}
                             </div>
                             @endif
+                            @error('persons')
+                            <div class="alert alert-danger">
+                                <i class="fa fa-exclamation-circle"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
                         </div>
                         <div id="alert" class="error-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>

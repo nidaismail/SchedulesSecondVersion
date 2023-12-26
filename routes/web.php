@@ -57,7 +57,7 @@ Route::get('/', function () {
     Route::get('edit/{id}', [App\Http\Controllers\AdmindashboardController::class, 'show']);
     Route::post('edit/{id}', [App\Http\Controllers\AdmindashboardController::class, 'edit']);
     Route::get('delete-records', [App\Http\Controllers\UserdashboardController::class, 'index']);
-    Route::get('delete/{id}', [App\Http\Controllers\UserdashboardController::class, 'destroy']);
+    Route::delete('delete/{ids}', [App\Http\Controllers\UserdashboardController::class, 'deleteRecords'])->name('delete');
     Route::get('/otherFunctionality', [App\Http\Controllers\UserController::class, 'otherFunctionality'])->name('otherFunctionality');
         
 });

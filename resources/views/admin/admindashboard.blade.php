@@ -48,40 +48,61 @@
           $('#preview-btn').click(function () {
               previewTable();
           });
-      
           $('#export-btn').click(function () {
-              exportToExcel();
-          });
-      
-          function previewTable() {
-              // Your existing logic for previewing the table
-              // Add any additional preview-related actions here
-              console.log('Table previewed!');
-          }
-      
-          function exportToExcel() {
-              const table = $('.filterable .table')[0];
-              const filterDate = $('#filter_date').val(); // Get the selected date
-      
-              // Create a worksheet
-              const ws = XLSX.utils.table_to_sheet(table);
-      
-              // Add headers to the worksheet
-              const headers = ['Day', 'Time From', 'Time To', 'Person', 'Activity', 'Class', 'Location', 'Remarks'];
-              XLSX.utils.sheet_add_aoa(ws, [headers], { origin: 'A1' });
-      
-              // Add a row with the selected date
-              XLSX.utils.sheet_add_aoa(ws, [['Selected Date: ' + filterDate]], { origin: 'A1' });
-      
-              // Create a new workbook and append the worksheet
-              const wb = XLSX.utils.book_new();
-              XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-      
-              // Generate XLSX file and save to download
-              XLSX.writeFile(wb, 'exported_data.xlsx');
-          }
-      });
-      </script>
+            const table = $('.filterable .table')[0];
+            const filterDate = $('#filter_date').val(); // Get the selected date
+
+            // Check if there are rows in the table
+            if ($(table).find('tbody tr').length > 0) {
+                exportToExcel(table, filterDate);
+            } else {
+                // Show an alert when there's no data to export
+                alert('No data available in the table for export.');
+            }
+        });
+
+        function formatDateString(dateString) {
+            const dateParts = dateString.split('-'); // Assuming date is in yyyy-mm-dd format
+            const formattedDate = dateParts[2] + dateParts[1] + dateParts[0]; // Format to ddmmyyyy
+            return formattedDate;
+        }
+
+        function exportToExcel(table, filterDate) {
+            const headers = ['Day', 'Time From', 'Time To', 'Person', 'Activity', 'Class', 'Location', 'Remarks'];
+
+            // Remove the "Action" header from headers
+            const actionIndex = headers.indexOf('Action');
+            if (actionIndex !== -1) {
+                headers.splice(actionIndex, 1);
+            }
+
+            const dataRows = [];
+            $('.filterable .table tbody tr').each(function () {
+                const rowData = [];
+                $(this).find('td:not(:last-child)').each(function () { // Exclude last td (Action column)
+                    rowData.push($(this).text());
+                });
+                dataRows.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet([headers].concat(dataRows));
+
+            // Format date as ddmmyyyy for sheet name
+            const formattedDate = formatDateString(filterDate);
+            const sheetName = 'Timetable_' + formattedDate; // Set the customized sheet name
+
+            // Set font size
+            ws['!cols'] = [{ wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 20 }];
+
+            XLSX.utils.sheet_add_aoa(ws, [['Selected Date: ' + filterDate]], { origin: 'A1' });
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetName); // Set the customized sheet name
+            XLSX.writeFile(wb, sheetName + '.xlsx'); // Set the filename with the customized sheet name
+        }
+    });
+</script>
+
 <script>
 /*
 Please consider that the JS part isn't production ready at all, I just code it to show the concept of merging filters and titles together !
@@ -201,7 +222,7 @@ $(document).ready(function() {
                 <i class="ni ni-key-25 text-info"></i> Location Activity
             </a>
             <a class="btn btn-custom mr-2" href="{{url('/getSchedules')}}" target="_self">
-                <i class="ni ni-key-25 text-info"></i>Weekly Schedule
+                <i class="ni ni-key-25 text-info"></i>Monthly Schedule
             </a>
             
         </div>

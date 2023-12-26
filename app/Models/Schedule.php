@@ -9,7 +9,7 @@ class Schedule extends Model
 {
     use HasFactory;
     protected $table = "schedule";
-    protected $fillable = ['location_id', 'user_id'];
+    protected $fillable = ['location_id', 'user_id','time_from', 'time_to', 'remarks', 'department', 'activity_id','day','date','class_id',];
     public function location()
     {
         return $this->belongsTo(Location::class);
@@ -30,4 +30,8 @@ class Schedule extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function department()
+{
+    return $this->belongsTo(Department::class, 'department');
+}
 }

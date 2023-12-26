@@ -146,9 +146,39 @@
 .btn-custom:hover {
     color: #575151; /* Change text color to white on hover */
 }
-/* .body{
-    overflow-y: hidden;
-} */
+#locationDropdown + .dropdown-menu {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Style for the search input */
+#locationSearch {
+    width: calc(100% - 20px);
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Style for individual location items */
+.location-item {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+/* Style for radio buttons */
+.location-item input[type="radio"] {
+    margin-right: 5px;
+    transform: scale(1.2); /* Increase the radio button size */
+}
+
+/* Style for the labels of location items */
+.location-item label {
+    cursor: pointer;
+}
 </style>
     {{-- <nav class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
         <div class="container-fluid">
@@ -360,12 +390,7 @@
                                     </div>
                                 
                                 <div class="table-wrapper">
-                                    @if($location)
-                                    <p>
-                                        Schedule for {{ $location->name }} <!-- Replace $selectedClass with your class variable -->
-                                        from {{ date('d-m-Y', strtotime($startDate)) }} to {{ date('d-m-Y', strtotime($endDate)) }}
-                                    </p>
-                                @endif
+                                   
                                     <table class="table table-bordered table-responsive">
                                         <thead>
                                             <tr>
@@ -389,44 +414,35 @@
                                             @endphp
                                             <!-- Rows for each date -->
                                             @foreach ($selectedDates as $date)
-                                                <tr>
-                                                    <td>{{ date('d-m-Y', strtotime($date)) }} <br>
-                                                        {{ date('l', strtotime($date)) }}</td>
-                                                    <!-- Display occupied and unoccupied hours -->
-                                                    @php
-                                                        $occupiedHours = 0;
-                                                        $unoccupiedHours = 0;
-                                                    @endphp
-                                                    @foreach ($timeIntervals as $interval)
-                                                        @php
-                                                            $cellData = $occupancyData[$date][$interval] ?? null;
-                                                            $cellColor = $cellData['color'] ?? 'green'; // Default to green if data is not present
-                                                            if ($cellColor === 'red') {
-                                                                $occupiedHours += 0.25; // Assuming each interval represents 15 minutes (0.25 hours)
-                                                            } else {
-                                                                $unoccupiedHours += 0.25;
-                                                            }
-                                                        @endphp
-                                                    @endforeach
-                                                    <!-- Display the calculated occupied and unoccupied hours -->
-                                                    <td>
-                                                        <span style= "color:red; font-weight:bold;">{{ $occupiedHours }}  </span><span style="font-weight:bold";>-</span>
-                                                        <span style= "color:#24A884; font-weight:bold;">{{ $unoccupiedHours }}  </span>
-                                                    </td>
-                                                    <!-- Cells for booked/free intervals -->
-                                                    @foreach ($timeIntervals as $interval)
-                                                        @php
-                                                            $cellData = $occupancyData[$date][$interval] ?? null;
-                                                            $cellColor = $cellData['color'] ?? 'green'; // Default to green if data is not present
-                                                            $tooltipContent = $cellData['details'] ?? ''; // Default to empty string if data is not present
-                                                        @endphp
-                                                        <td style="background-color: {{ $cellColor }}" data-toggle="tooltip" title="{{ $tooltipContent }}">
-                                                            <!-- If the cell is occupied (red), display a tooltip -->
-                                                            <!-- Tooltip will show the person's name and class -->
-                                                        </td>
-                                                    @endforeach
-                                                </tr>
-                                            @endforeach
+    <tr>
+        <td>
+            {{ date('d-m-Y', strtotime($date)) }} <br>
+            {{ date('l', strtotime($date)) }}
+        </td>
+
+        <!-- ... other code ... -->
+
+        <!-- Cells for booked/free intervals -->
+        @foreach ($timeIntervals as $interval)
+            @php
+                $cellData = $occupancyData[$date][$interval] ?? null;
+                $cellColor = $cellData['color'] ?? 'green'; // Default to green if data is not present
+                $tooltipContent = $cellData['details'] ?? ''; // Default to empty string if data is not present
+                
+                // Check if the current date is a Saturday or Sunday
+                $dayOfWeek = date('N', strtotime($date)); // Get day of the week (1 for Monday, 7 for Sunday)
+                if ($dayOfWeek == 6 || $dayOfWeek == 7) {
+                    $cellColor = 'black'; // Set cell color to yellow for Saturday (6) and Sunday (7)
+                }
+            @endphp
+            <td style="background-color: {{ $cellColor }}" data-toggle="tooltip" title="{{ $tooltipContent }}">
+                <!-- If the cell is occupied (red), display a tooltip -->
+                <!-- Tooltip will show the person's name and class -->
+            </td>
+        @endforeach
+    </tr>
+@endforeach
+
                                         </tbody>
                                     </table>
                                     

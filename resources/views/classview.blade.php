@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @push('styles')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
@@ -16,6 +17,74 @@
     {{-- {{-- <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"> --}}
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+    <script>
+  $(document).ready(function () {
+    $('#deleteSelectedButton').on('click', function (event) {
+        event.preventDefault();
+        var selectedRows = $('#dataTable').find('input[type=checkbox]:checked').closest('tr');
+        var selectedIds = selectedRows.map(function () {
+            return $(this).find('input[type=checkbox]').data('id');
+        }).get();
+
+        if (selectedIds.length > 0) {
+            var confirmation = confirm('Are you sure you want to delete selected record(s)?');
+            if (confirmation) {
+                deleteRecords(selectedIds, selectedRows); // Pass selected rows for removal
+            }
+        } else {
+            alert('Please select at least one record to delete.');
+        }
+    });
+
+    function deleteRecords(ids, rowsToRemove) {
+        $.ajax({
+            url: '/delete/' + ids.join(','),
+            type: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.hasOwnProperty('success')) {
+                    displayMessage(response.success, 'success');
+                    // Remove deleted rows from the table
+                    rowsToRemove.remove(); // Remove selected rows from the table
+                } else {
+                    displayMessage(response.error, 'error');
+                }
+            },
+            error: function (xhr) {
+                displayMessage('Failed to Delete Records', 'error');
+            }
+        });
+    }
+
+    function displayMessage(message, type) {
+        var messageBox = '<div class="alert alert-' + type + '">' + message + '</div>';
+        $('#messageContainer').html(messageBox);
+        // Automatically remove the message after 3 seconds
+        setTimeout(function () {
+            $('#messageContainer').empty();
+        }, 3000);
+    }
+});
+    </script>
+    <script>
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const individualCheckboxes = document.querySelectorAll('.individualCheckbox');
+        
+            individualCheckboxes.forEach(function(checkbox) {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+       
+    
+        // Your existing JavaScript code
+       
+    </script>
 <style>
     .filterable {
   margin-top: 1.5rem;
@@ -195,7 +264,7 @@
 
 
     <div class="">
-       
+      
         {{-- <nav class="sb-topnav navbar navbar-expand navbar-dark align">
             <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
                 <li class="nav-item dropdown">
@@ -302,6 +371,7 @@
         </div>
     </div>
                                         <table  class=" table table-bordered table-responsive" id="dataTable" >
+                                            <div id="messageContainer"></div>
                                             @if(session('success'))
                                             <div class="alert alert-success">
                                                 {{ session('success') }}
@@ -366,15 +436,13 @@
                                                                             <label class="form-check-label"
                                                                                 for="flexSwitchCheckDefault"></label>
                                                                         </div></td><td>
-                                                                            <a href="{{ url('delete', $group[0]->id) }}" class="delete-button" style="color: #1BA998;">
-                                                                                <i class="fas fa-trash-alt"></i>
-                                                                            </a>
+                                                                            <input type="checkbox" class="individualCheckbox">
                                                                         </td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>
                                                     </table>
-                                       
+                                                    <button id="deleteSelectedButton" class="btn btn-danger">Delete Selected</button>
                                                 </div>
                                             </div>
                                         </div>
