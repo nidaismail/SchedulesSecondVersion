@@ -151,40 +151,7 @@
             }
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const classSelectionInput = document.getElementById('classSelection');
-            const tableRows = document.querySelectorAll('#persontable tbody tr');
-
-            function applyFilters() {
-                const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
-                const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
-                const selectedClass = classSelectionInput.value.toLowerCase().trim();
-
-                tableRows.forEach(function(row) {
-                    const rowDate = new Date(row.cells[0].innerText); // Assuming date is in the first column
-                    const rowClass = row.cells[6].innerText.toLowerCase().trim(); // Assuming class name is in the seventh column
-
-                    const showByDate = (!startDate || !endDate || (rowDate >= startDate && rowDate <= endDate));
-                    const showByClass = (!selectedClass || rowClass === selectedClass);
-
-                    if (showByDate && showByClass && selectedClass !== '') {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            }
-
-            startDateInput.addEventListener('change', applyFilters);
-            endDateInput.addEventListener('change', applyFilters);
-            classSelectionInput.addEventListener('change', applyFilters);
-
-            applyFilters(); // Initially hide/show rows based on initial filter values
-        });
-    </script>
+    
 <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 <script>
     function toggleSelectAll() {
@@ -199,9 +166,7 @@
     <script>
     $(document).ready(function() {
     
-      $('input[type=date]').change(function () {
-        this.form.submit();
-      });
+      
     
         $('.filterable .btn-filter').click(function() {
             var $panel = $(this).parents('.filterable'),
@@ -256,19 +221,7 @@
     </div>
     @endif
     <div class="">
-        {{-- <nav class="sb-topnav navbar navbar-expand navbar-dark align">
-            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">Settings</a></li>
-                        <li><a class="dropdown-item" href="#!">Activity Log</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav> --}}
+       
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -279,10 +232,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Person Activity
                             </a>
-                            <a class="nav-link" href="{{ route('view') }}">
+                            {{-- <a class="nav-link" href="{{ route('view') }}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Class Activity
-                            </a>
+                            </a> --}}
                             <a class="nav-link" href="{{ route('home') }}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Home
@@ -324,29 +277,35 @@
                                                         <div class="container text-left">
                                                             <div class="row justify-content-center given-mar">
                                                                 <div class="col-lg-10">
+                                                                    <form id="filterForm" method="GET" action="{{ route('viewdata') }}">
                                                                     <div class="row">
-                                                                        <div class="col-md-4">
+                                                                        <div class="col-md-3">
                                                                             <div class="form-group">
                                                                                 <label for="startDate" style="color: #1BA998; font-size: 16px; font-weight: bold; text-transform: uppercase;">Date From</label>
                                                                                 <input type="date" style="background-color: #1BA998; color:white; font-weight: bold; "data-date="" data-date-format="DD MMMM YYYY" min="0" name="start_date" class="form-control" id="startDate" placeholder="" style="" required value="<?php echo date('Y-m-d'); ?>">
                                                                             </div>
                                                                         </div>
-                                                                        <div class="col-md-4">
+                                                                        <div class="col-md-3">
                                                                             <div class="form-group">
                                                                                 <label for="endDate" style="color: #1BA998; font-size: 16px; padding-left:14px; font-weight: bold; text-transform: uppercase;">Date To</label>
                                                                                 <input type="date" style="background-color: #1BA998; color:white; font-weight: bold; " data-date="" data-date-format="DD MMMM YYYY" name="end_date" class="form-control" id="endDate" placeholder="End Date" required value="<?php echo date('Y-m-t', strtotime('0 months')); ?>">
                                                                             </div>
                                                                         </div>
-                                                                        <div class="col-md-4">
+                                                                        <div class="col-md-3">
                                                                             <div class="form-group text-center">
                                                                                 <label for="classSelection" style="color: #1BA998; font-size: 16px; font-weight: bold; text-transform: uppercase;">Filter by Class:</label>
-                                                                                <select  id="classSelection" class="form-control">
+                                                                                <select  id="classSelection" class="form-control" name="classSelection">
                                                                                     <option  value="">Select a Class</option>
                                                                                     <!-- Embedding PHP data into HTML -->
                                                                                     @foreach($classes as $class)
-                                                                                        <option value="{{ $class->class_name }}">{{ $class->class_name }}</option>
+                                                                                        <option value="{{ $class->id }}">{{ $class->class_name }}</option>
                                                                                     @endforeach
                                                                                 </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-3">
+                                                                            <div class="form-group text-center" >
+                                                                                <button type="submit" class="btn btn-primary" style="margin-top:2rem; background-color:#1BA998">Apply</button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -359,100 +318,87 @@
                                             </div>
                                         </div>
                                     </div>
-                                                    <table class="table table-bordered table-responsive" id="persontable">
-                                                        <div id="messageContainer"></div>
-                                                         @if(session('success'))
-                                                        <div class="alert alert-success">
-                                                            {{ session('success') }}
-                                                        </div>
-                                                    @endif
+                                </form>
 
-                                                    @if(session('error'))
-                                                        <div class="alert alert-danger">
-                                                            {{ session('error') }}
-                                                        </div>
-                                                    @endif        <thead>
-                                                          
-                                                        <tr class="filters">
-                                                                 <th><input type="text" class="form-control" placeholder="Date" disabled></th> 
-                                                                <th><input type="text" class="form-control" placeholder="Day" disabled></th>
-                                                                
-                                                                <th><input type="text" class="form-control" placeholder="Time From"disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Time To" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Person" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Activity" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Class" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Location" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Remarks" disabled></th>
-                                                                <th><input type="text" class="form-control" placeholder="Non-Admissible" disabled></th>
-                                                                <th style="font-size:9px">
-                                                                    <div style="text-align: center; width: 120%; height: 120%; background-color: white;" class="select-all">
-                                                                        <input style="text-align: center;" type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
-                                                                    </div>
-                                                                </th></tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($persondata as $data)
-                                                                <tr>
-                                                                    <td>{{ \Carbon\Carbon::parse($data->date)->format('d F, Y') }}</td>
-                                                                    <td>{{$data->day}}</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($data->time_from)->format('h:i A') }}</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($data->time_to)->format('h:i A') }}</td>
-                                                                    <td>{{$data->user->name}} </td>
-                                                                    <td>{{$data->activity->activity_name}} </td>
-                                                                    <td>{{$data->class->class_name}} </td>
-                                                                    <td>{{$data->location->location}} </td>
-                                                                    <td>{{$data->remarks}}</td>
-                                                            
-                                                                    <td>
-                                                                        <?php
-                                                                        $checked =  $data->admissible==1 ? 'checked="checked"' : 'nooo'?>
-                                                                        <div class="form-check form-switch">
-                                                                            <input data-id="{{$data->id}}" {{$checked}}
-                                                                                class="flexSwitchCheckDefault form-check-input" name="toggle"
-                                                                                type="checkbox" role="switch" class="" />
-                                                                            <label class="form-check-label"
-                                                                                for="flexSwitchCheckDefault"></label>
-                                                                        </div>
-                                                                    </td>
-                                                                <td>
-                                                                            <input type="checkbox" class="individualCheckbox">
-                                                                        </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                    <button id="deleteSelectedButton" class="btn btn-danger">Delete Selected</button>
-                                                    <!-- <table class="table table-bordered table-responsive" id="classtable" style="display: none";>
-                                                        <thead>
-                                                            <tr>
-                                                                <th width="150px">Class</th>
-                                                                <th width="200px">Date</th>
-                                                                <th width="150px">Day</th>
-                                                                <th width="150px">Time From</th>
-                                                                <th width="150px">Time To</th>
-                                                                <th width="150px">Person</th>
-                                                                <th width="150px">Activity</th>
-                                                                <th width="250px">Location</th>
-                                                                <th width="150px">Remarks</th>
-                                                                <th width="150px">Non-Admissible</th>
-                                                                
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            
-                                                        </tbody>
-                                                    </table> -->
-                                                </div>
+                                <table class="table table-bordered table-responsive" id="persontable">
+                                    <div id="messageContainer"></div>
+                                        @if(session('success'))
+                                            <div class="alert alert-success">
+                                                {{ session('success') }}
                                             </div>
-                                        </div>
-                                      
+                                        @endif
+                                        @if(session('error'))
+                                            <div class="alert alert-danger">
+                                                {{ session('error') }}
+                                            </div>
+                                        @endif        
+                                        <thead>          
+                                            <tr class="filters">
+                                                <th><input type="text" class="form-control" placeholder="Date" disabled></th> 
+                                                <th><input type="text" class="form-control" placeholder="Day" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Time From"disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Time To" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Person" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Activity" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Class" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Location" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Remarks" disabled></th>
+                                                <th><input type="text" class="form-control" placeholder="Non-Admissible" disabled></th>
+                                                <th style="font-size:9px">
+                                                    <div style="text-align: center; width: 120%; height: 120%; background-color: white;" class="select-all">
+                                                        <input style="text-align: center;" type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if(isset($filteredData) && count($filteredData) > 0)
+                                            @foreach($filteredData as $data)
+                                            
+                                                <tr>
+                                                    <td>{{ \Carbon\Carbon::parse($data->date)->format('d F, Y') }}</td>
+                                                    <td>{{$data->day}}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($data->time_from)->format('h:i A') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($data->time_to)->format('h:i A') }}</td>
+                                                    <td>{{$data->user->name}} </td>
+                                                    <td>{{$data->activity->activity_name}} </td>
+                                                    <td>{{$data->class->class_name}} </td>
+                                                    <td>{{$data->location->location}} </td>
+                                                    <td>{{$data->remarks}}</td>
+                                                    <td>
+                                                        <?php
+                                                            $checked =  $data->admissible==1 ? 'checked="checked"' : 'nooo'?>
+                                                            <div class="form-check form-switch">
+                                                                <input data-id="{{$data->id}}" {{$checked}}
+                                                                class="flexSwitchCheckDefault form-check-input" name="toggle"
+                                                                type="checkbox" role="switch" class="" />
+                                                                <label class="form-check-label"
+                                                                for="flexSwitchCheckDefault"></label>
+                                                            </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" class="individualCheckbox">
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            @else
+                    <!-- Display a message if no data available -->
+                    <tr>
+                        <td colspan="10" class="text-center">No data available</td>
+                    </tr>
+                @endif
+                                        </tbody>
+                                    </table>
+                                    <button id="deleteSelectedButton" class="btn btn-danger">Delete Selected</button>
                                     </div>
-                                </main>
-                            </div>
+                                </div>
+                            </div>   
                         </div>
-                    </div>
+                    </main>
                 </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @prepend('scripts')
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"
@@ -465,6 +411,7 @@
 <script src="assets/demo/chart-bar-demo.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
 <script src="js/datatables-simple-demo.js"></script>
+
 <script>
 $(document).ready(function() {
     $('#btn-save').on('click', function(e) {

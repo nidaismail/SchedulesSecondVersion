@@ -180,63 +180,6 @@
     cursor: pointer;
 }
 </style>
-    {{-- <nav class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
-        <div class="container-fluid">
-            <!-- Toggler -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sidenav-collapse-main"
-                aria-controls="sidenav-main" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- Brand -->
-            <a class="navbar-brand pt-0" href="https://www.anth.pk/" target="_blank" >
-                <img src="./images/brand/CIRS.png" class="navbar-brand-img" alt="...">
-            </a>
-            <!-- User -->
-            <!-- Collapse -->
-            <div class="collapse navbar-collapse" id="sidenav-collapse-main">
-                <!-- Collapse header -->
-                <div class="navbar-collapse-header d-md-none">
-                    <div class="row">
-                        <div class="col-6 collapse-brand">
-                            <a href="https://www.anth.pk/" target="_blank">
-                                <img src="./images/brand/CIRS.png">
-                            </a>
-                        </div>
-                        <div class="col-6 collapse-close">
-                            <button type="button" class="navbar-toggler" data-toggle="collapse"
-                                data-target="#sidenav-collapse-main" aria-controls="sidenav-main" aria-expanded="false"
-                                aria-label="Toggle sidenav">
-                                <span></span>
-                                <span></span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <ul class="navbar-nav">
-                  <li class="nav-item">
-                        <a class="nav-link" href="{{url('/admin')}}" target="_self">
-                            <i class="ni ni-key-25 text-info"></i> Person Activity 
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('/classadmin')}}" target="_self">
-                            <i class="ni ni-key-25 text-info"></i> Class Activity
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('/locationadmin')}}" target="_self">
-                            <i class="ni ni-key-25 text-info"></i> Location Activity 
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link " href="{{url('/home')}}">
-                            <i class="ni ni-single-02 text-yellow"></i> Home
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-      </nav> --}}
       <header class="navbar navbar-expand-md navbar-light bg-white">
         <div class="container-fluid">
             <!-- Toggler -->
@@ -248,8 +191,6 @@
             <a class="navbar-brand pt-0" href="https://www.anth.pk/" target="_blank">
                 <img src="./images/brand/CIRS.png" class="navbar-brand-img" alt="...">
             </a>
-            <!-- User or any other elements you want -->
-            <!-- ... -->
         </div>
         <!-- Collapse content -->
         <div class="collapse navbar-collapse" id="sidenav-collapse-main">
@@ -289,14 +230,9 @@
                 <a class="btn btn-custom mr-2" href="{{url('/admin')}}" target="_self">
                     <i class="ni ni-key-25 text-info"></i> Person Activity
                 </a>
-                
             </div>
-
-
-
         </div>
     </header>
-    
       <div class="main-content">
         <!-- Navbar -->
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -385,23 +321,22 @@
                                     </div>
                                 </div>
                             </div>
-                                        <div class="col pull-right text-left">
-                                        <h3 class="mb-10 panel-title"></h3>
-                                    </div>
-                                
+                            <div class="col pull-right text-left">
+                                <h3 class="mb-10 panel-title"></h3>
+                            </div>
                                 <div class="table-wrapper">
-                                   
                                     <table class="table table-bordered table-responsive">
                                         <thead>
                                             <tr>
-                                                <th style ="font-size: 12px; font-weight: bold">Date</th>
-                                                <th style ="font-size: 12px; font-weight: bold">Utility</th> <!-- New column header -->
+                                                <th style="font-size: 12px; font-weight: bold">Date</th>
+                                                <th style="font-size: 12px; font-weight: bold">Utility</th>
+                                                
                                                 <!-- Headers for intervals -->
                                                 @foreach ($timeIntervals as $interval)
                                                     @php
                                                         [$startTime, $endTime] = explode(' - ', $interval); // Splitting start and end times
                                                     @endphp
-                                                    <th style ="padding-right: 0.5rem; padding-left:0.6rem; font-size: 12px; font-weight: bold">
+                                                    <th style="padding-right: 0.5rem; padding-left:0.6rem; font-size: 12px; font-weight: bold">
                                                         <div>{{ $startTime }} </div>
                                                         <div>{{ $endTime }}</div>
                                                     </th>
@@ -414,51 +349,68 @@
                                             @endphp
                                             <!-- Rows for each date -->
                                             @foreach ($selectedDates as $date)
-    <tr>
-        <td>
-            {{ date('d-m-Y', strtotime($date)) }} <br>
-            {{ date('l', strtotime($date)) }}
-        </td>
-
-        <!-- ... other code ... -->
-
-        <!-- Cells for booked/free intervals -->
-        @foreach ($timeIntervals as $interval)
-            @php
-                $cellData = $occupancyData[$date][$interval] ?? null;
-                $cellColor = $cellData['color'] ?? 'green'; // Default to green if data is not present
-                $tooltipContent = $cellData['details'] ?? ''; // Default to empty string if data is not present
+                                                <tr>
+                                                    <td>
+                                                        {{ date('d-m-Y', strtotime($date)) }} <br>
+                                                        {{ date('l', strtotime($date)) }}
+                                                    </td>
+                                                    @php
+                                                        // Initialize variables to hold occupied and unoccupied hours for each date
+                                                        $occupiedHours = 0;
+                                                        $unoccupiedHours = 0;
+                                                        $intervalOccupancy = []; // Array to store interval occupancy data
+                                                        $isWeekend = (date('N', strtotime($date)) >= 6); // Check if it's Saturday (6) or Sunday (7)
                 
-                // Check if the current date is a Saturday or Sunday
-                $dayOfWeek = date('N', strtotime($date)); // Get day of the week (1 for Monday, 7 for Sunday)
-                if ($dayOfWeek == 6 || $dayOfWeek == 7) {
-                    $cellColor = 'black'; // Set cell color to yellow for Saturday (6) and Sunday (7)
-                }
-            @endphp
-            <td style="background-color: {{ $cellColor }}" data-toggle="tooltip" title="{{ $tooltipContent }}">
-                <!-- If the cell is occupied (red), display a tooltip -->
-                <!-- Tooltip will show the person's name and class -->
-            </td>
-        @endforeach
-    </tr>
-@endforeach
-
+                                                    @endphp
+                                                    @foreach ($timeIntervals as $interval)
+                                                        @php
+                                                            $cellData = $occupancyData[$date][$interval] ?? null;
+                                                            $cellColor = $cellData['color'] ?? 'green'; // Default to green if data is not present
+                                                            // Calculate occupied and unoccupied hours based on cell color
+                                                            if ($cellColor === 'red') {
+                                                                $occupiedHours += 0.25; // Assuming each interval represents 15 minutes (0.25 hours)
+                                                            } else {
+                                                                $unoccupiedHours += 0.25;
+                                                            }
+                                                            // Store occupancy data for each interval
+                                                            $intervalOccupancy[] = [
+                                                                'color' => $cellColor,
+                                                                'details' => $cellData['details'] ?? '',
+                                                            ];
+                                                        @endphp
+                                                    @endforeach
+                                                    <!-- Display occupied and unoccupied hours before intervals -->
+                                                    <td> <span style= "color:red; font-weight:bold;">{{ $occupiedHours }} </span><span style="font-weight:bold";>-</span><span style= "color:#24A884; font-weight:bold;"> {{ $unoccupiedHours }}</span></td>
+                                                    
+                                                    <!-- Render intervals with cell coloring -->
+                                                    @foreach ($intervalOccupancy as $data)
+                                                    @php
+                                                        $cellColor = $data['color'];
+                                                        // If it's a weekend, change the cell color to black
+                                                        if ($isWeekend) {
+                                                            $cellColor = 'black';
+                                                        }
+                                                    @endphp
+                                                    <td style="background-color: {{ $cellColor }}" data-toggle="tooltip" title="{{ $data['details'] }}">
+                                                        <!-- If the cell is occupied (red), display a tooltip -->
+                                                        <!-- Tooltip will show the person's name and class -->
+                                                    </td>
+                                                @endforeach
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                     
-                                    
                                 </div>
-                                                </div>
-                                  
-                                            </form>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
+</div>
+</div>
     <!--   Core   -->
     <script src="./js/plugins/jquery/dist/jquery.min.js"></script>
     <script src="./js/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -32,7 +32,7 @@ Route::get('/', function () {
     //Route::get('//location-Check', [App\Http\Controllers\HomeController::class, 'check']); 
     
     Route::get('/viewdata', [App\Http\Controllers\UserdashboardController::class, 'preview'])->name('viewdata');
-    Route::get('/view', [App\Http\Controllers\UserdashboardController::class, 'classview'])->name('view');
+    // Route::get('/view', [App\Http\Controllers\UserdashboardController::class, 'classview'])->name('view');
     
     Route::post('/admissible', [App\Http\Controllers\UserdashboardController::class, 'admissible'])->name('admissible');  
     
@@ -59,6 +59,7 @@ Route::get('/', function () {
     Route::get('delete-records', [App\Http\Controllers\UserdashboardController::class, 'index']);
     Route::delete('delete/{ids}', [App\Http\Controllers\UserdashboardController::class, 'deleteRecords'])->name('delete');
     Route::get('/otherFunctionality', [App\Http\Controllers\UserController::class, 'otherFunctionality'])->name('otherFunctionality');
+    Route::get('/filter-data', [App\Http\Controllers\UserdashboardController::class, 'filterData'])->name('filterData');
         
 });
 Route::group(['middleware' => ['auth']], function() {
